@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "httpserver"
+  namespace: default
+  labels:
+    app: "httpserver"
+spec:
+  containers:
+    - name: httpserver
+      image: "reg.tcy.cn/my/httpserver:latest"
+      ports:
+        - containerPort: 80
+      #      startupProbe:
+      #        exec:
+      #          command: [ "/bin/sh","-c","cat /app/abc" ]  ## 返回不是0，那就是探测失败
+      #        # initialDelaySeconds: 20 ## 指定的这个秒以后才执行探测
+      #        ## 每隔几秒来运行这个
+      #        periodSeconds: 5
+      #        ##探测超时，到了超时时间探测还没返回结果说明失败
+      #        timeoutSeconds: 5
+      #        ## 成功阈值，连续几次成才算成功
+      #        successThreshold: 1
+      #        ## 失败阈值，连续几次失败才算真失败
+      #        failureThreshold: 3
+      livenessProbe: ## 容器有没有 /heathz，就绪探针
+        httpGet:
+          host: "127.0.0.1"
+          path: /heathz
+          port: 80
+          scheme: HTTP
+          ## 每隔几秒来运行这个
+        periodSeconds: 5
+        ## 成功阈值，连续几次成才算成功
+        successThreshold: 1
+        ## 失败阈值，连续几次失败才算真失败
+        failureThreshold: 5
+      #      readinessProbe: ##就绪检测，都是http
+      #        httpGet:
+      #          # host: 127.0.0.1  ###不写
+      #          path: /abc.html  ## 给容器发请求
+      #          port: 80
+      #          scheme: HTTP ## 返回不是0，那就是探测失败
+      #        initialDelaySeconds: 2 ## 指定的这个秒以后才执行探测
+      #        periodSeconds: 5  ## 每隔几秒来运行这个
+      #        timeoutSeconds: 5  ##探测超时，到了超时时间探测还没返回结果说明失败
+      #        successThreshold: 3 ## 成功阈值，连续几次成才算成功
+      #        failureThreshold: 5 ## 失败阈值，连续几次失败才算真失败
+      lifecycle:
+        preStop:
+          httpGet:
+            host: "127.0.0.1"
+            path: "/preStop"
+            port: 80
+            scheme: HTTP
