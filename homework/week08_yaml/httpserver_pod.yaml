@@ -2,13 +2,20 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: "httpserver"
-  namespace: default
+  namespace: cncamp
   labels:
     app: "httpserver"
 spec:
   containers:
     - name: httpserver
       image: "reg.tcy.cn/my/httpserver:latest"
+      resources:
+        requests:
+          cpu: 100m
+          memory: 100Mi
+        limits:
+          cpu: 100m
+          memory: 100Mi
       ports:
         - containerPort: 80
       #      startupProbe:
